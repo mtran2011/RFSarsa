@@ -26,7 +26,7 @@ class StockTradingEnvironment(Environment):
     def run(self, nrun, report=False):
         self.exchange.reset_episode()
         if report is True:
-            result = {trader.name: [0] for trader in self.exchange.traders}
+            result = {trader.name: [trader.wealth] for trader in self.exchange.traders}
         for step_count in range(1,nrun+1):
             for trader in self.exchange.traders:
                 trader.place_order()

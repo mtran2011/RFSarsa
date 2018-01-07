@@ -26,3 +26,14 @@ class StockTrader(object):
         self.step_count = 0
         self.reward = None
         self.state = (self.exchange.curr_price, self.holding)
+    
+    def reset_episode(self):
+        ''' Reset at the beginning of an episode
+        '''
+        pass
+
+    def get_updated_price(self, old_price: float, new_price: float):
+        ''' Observe that the stock price on the exchange has moved
+        '''
+        pass
+    

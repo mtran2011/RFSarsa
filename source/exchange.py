@@ -31,9 +31,11 @@ class StockExchange(object):
         self.traders.add(trader)
 
     def reset_episode(self):
-        # reset holding of each trader to 0
-        # reset learner's last action and last state
-        pass
+        ''' Reset at the beginning of an episode
+        '''
+        self.prev_price = None
+        for trader in self.traders:
+            trader.reset_episode()
 
     def execute(self, order: int):
         ''' Execute an order from a particular trader
