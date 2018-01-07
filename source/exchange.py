@@ -12,10 +12,8 @@ class StockExchange(object):
         traders (set): a set of instances of StockTrader
     '''
     def __init__(self, stock: Stock, lot: int, tick: int, max_holding: int):
-        if lot <= 0 or max_holding <= 0:
-            raise ValueError('lot and max_holding must be positive')
-        if tick not in (1, 0.1, 0.01):
-            raise ValueError('tick must be 1, 0.1, or 0.01')
+        assert lot > 0 and max_holding > 0
+        assert tick in (1, 0.1, 0.01)
         self.stock = stock
         self.lot = lot
         self.tick = tick
@@ -24,12 +22,6 @@ class StockExchange(object):
     
     def register_trader(self, trader: StockTrader):
         self.traders.add(trader)
-
-    def reset_traders_holdings(self):
-        ''' To reset before a new game episode
-        '''
-        for trader in self.traders:
-            trader.reset_holding()
 
     def execute(self, order: int):
         ''' Execute an order from a particular trader
@@ -44,4 +36,6 @@ class StockExchange(object):
         return spread_cost + impact_cost
     
     def notify_traders(self, price: float):
-        # notify observers of new stock price
+        # notify observers of new simulated stock price
+        for trader in self.traders:
+            trader.get_notified(price)

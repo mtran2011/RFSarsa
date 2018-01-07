@@ -1,43 +1,35 @@
 import abc
+from exchange import StockExchange
 
 class Environment(abc.ABC):
     ''' Manage the interactions between a list of learners and exchanges
-    Attributes:        
-        learners (list): list of Learners
-        exchange (StockExchange): the exchange
+    Attributes:
+        exchange (StockExchange): the exchange that references traders
     '''    
 
-    def __init__(self, learners: list, exchange: StockExchange):
-        self.learners = learners
+    def __init__(self, exchange: StockExchange):        
         self.exchange = exchange
     
     @abc.abstractmethod
-    def run(self, util, nrun, report=False):
+    def run(self, nrun: int, report=False):
         ''' Run the learners for nrun iterations
         Args:
-            util (float): the constant in the utility function
             nrun (int): number of iterations to run
-            report (boolean): True to return a list of performance over time
+            report (boolean): True to return a performance over time of each trader
         Returns:
-            list: list of performance, e.g., cumulative wealth
+            dict: map each trader to its performance over nrun steps
         '''
-        pass
+        raise NotImplementedError
 
 class StockTradingEnvironment(Environment):
     # Override
-    def run(self, util, nrun, report=False):
-        # reset last_action and last_state of learner to None
-        # so that it doesn't use the initial reward=0 to learn internally
-        # reset shareholdings in exchange to 0
-        for learner in self.learners:
-            learner.reset_last_action()
+    def run(self, nrun, report=False):
         self.exchange.reset_episode()
-
-        reward = 0
-        state = (self.exchange.report_stock_price(), self.exchange.num_shares_owned)
-        wealth, wealths = 0, []
-
         for iter_ct in range(1,nrun+1):
+            for trader in self.exchange.traders:
+
+            
+            
             order = self.learner.learn(reward, state)
             transaction_cost = self.exchange.execute(order)
             pnl = self.exchange.simulate_stock_price()
