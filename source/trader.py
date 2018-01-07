@@ -4,14 +4,25 @@ class StockTrader(object):
     ''' A stock trader that wraps a Q or Sarsa learner inside
     Attributes:
         name (str): name of this trader
-        exchange (StockExchange): reference an exchange to send orders to
-        price_observed (float): the latest stock price seen
-        holding (int): current number of shares in holding
-        last_cost (float): transaction cost of the latest trade it placed
         utility (float): the utility constant
-        wealth (float): the current cumulative wealth
+        exchange (StockExchange): reference an exchange to send orders to
+        holding (int): the most recent number of shares in holding
+        transaction_cost (float): cost of the latest trade it placed
+        wealth (float): the most recent cumulative wealth
+        step_count (int): the number of iterations it has completed
+        reward (float): the most recent reward received
+        state (tuple): the most recent state of the environment seen
     '''
 
-    def __init__(self, exchange: StockExchange):
+    def __init__(self, name: str, utility: float, exchange: StockExchange):
+        self.name = name
+        assert utility > 0
+        self.utility = utility
         self.exchange = exchange
-        exchange.register_trader(self)
+        self.exchange.register_trader(self)
+        self.holding = 0
+        self.transaction_cost = 0
+        self.wealth = 0
+        self.step_count = 0
+        self.reward = None
+        self.state = (self.exchange.curr_price, self.holding)

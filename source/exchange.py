@@ -8,14 +8,14 @@ class StockExchange(object):
     Attributes:
         stock (Stock): the only stock on this exchange       
         lot (int): the lot size
-        tick (int): the tick size for this single stock
+        tick (float): the tick size for this single stock
         max_holding (int): the max number of shares a trader can long or short in cumulative
         traders (set): a set of instances of StockTrader
         prev_price (float): the one-step previous stock price rounded to tick
         curr_price (float): the current stock price rounded to tick
         roundings (dict): for convenience in rounding price to tick
     '''
-    def __init__(self, stock: Stock, lot: int, tick: int, max_holding: int):
+    def __init__(self, stock: Stock, lot: int, tick: float, max_holding: int):
         self.roundings = {1: 0, 0.1: 1, 0.01: 2}        
         assert lot > 0 and max_holding > 0
         assert tick in self.roundings
@@ -47,7 +47,8 @@ class StockExchange(object):
         impact_cost = num_lots**2 * self.tick
         return spread_cost + impact_cost
     
-    def notify_traders(self, price: float):
-        # notify observers of new simulated stock price
+    def notify_traders(self, old_price: float, new_price: float):
+        ''' Notify observers of new simulated stock price
+        '''
         for trader in self.traders:
-            trader.get_notified(price)
+            trader.get_updated_price(old_price, new_price)
