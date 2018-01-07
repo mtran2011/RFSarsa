@@ -1,3 +1,4 @@
+from stock import Stock
 from trader import StockTrader
 
 class StockExchange(object):
