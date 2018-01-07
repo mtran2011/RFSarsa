@@ -23,6 +23,11 @@ class StockExchange(object):
     def register_trader(self, trader: StockTrader):
         self.traders.add(trader)
 
+    def reset_episode(self):
+        # reset holding of each trader to 0
+        # reset learner's last action and last state
+        pass
+
     def execute(self, order: int):
         ''' Execute an order from a particular trader
         Args:

@@ -25,15 +25,18 @@ class StockTradingEnvironment(Environment):
     # Override
     def run(self, nrun, report=False):
         self.exchange.reset_episode()
-
-        # if report, tell all traders to memorize performance
-
-        for iter_ct in range(1,nrun+1):
+        if report is True:
+            result = {trader.name: [0] for trader in self.exchange.traders}
+        for step_count in range(1,nrun+1):
             for trader in self.exchange.traders:
                 trader.place_order()
             self.exchange.simulate_stock_price()
 
-            
+            if report is True:
+                for trader in self.exchange.traders:
+                    result[trader.name].append(trader.wealth)
+
+            ######################################################            
             
             order = self.learner.learn(reward, state)
             transaction_cost = self.exchange.execute(order)
@@ -42,15 +45,14 @@ class StockTradingEnvironment(Environment):
             delta_wealth = pnl - transaction_cost
             wealth += delta_wealth
 
-            reward = delta_wealth - 0.5 * util * (delta_wealth - wealth / iter_ct)**2
+            reward = delta_wealth - 0.5 * util * (delta_wealth - wealth / step_count)**2
             state = (self.exchange.report_stock_price(), self.exchange.num_shares_owned)
 
             if report:
                 wealths.append(wealth)
-            if iter_ct % 1000 == 0:
-                print('finished {:,} runs'.format(iter_ct))
+            if step_count % 1000 == 0:
+                print('finished {:,} runs'.format(step_count))
         
-        if report:
-            return wealths
-        else:
-            return None
+        if report is True:
+            return result
+        return None
