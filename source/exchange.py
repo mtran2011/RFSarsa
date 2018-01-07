@@ -61,4 +61,4 @@ class StockExchange(object):
         ''' Simulate the internal stock for one time step
         '''
         self.prev_price = self.curr_price
-        self.curr_price = round(self.stock.simulate_price(), self.roundings[tick])
+        self.curr_price = round(self.stock.simulate_price(), self.roundings[self.tick])
