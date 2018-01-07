@@ -25,8 +25,13 @@ class StockTradingEnvironment(Environment):
     # Override
     def run(self, nrun, report=False):
         self.exchange.reset_episode()
+
+        # if report, tell all traders to memorize performance
+
         for iter_ct in range(1,nrun+1):
             for trader in self.exchange.traders:
+                trader.place_order()
+            self.exchange.simulate_stock_price()
 
             
             
