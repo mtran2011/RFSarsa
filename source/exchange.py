@@ -28,6 +28,8 @@ class StockExchange(object):
         self.curr_price = round(stock.price, self.roundings[tick])
     
     def register_trader(self, trader: StockTrader):
+        ''' Register a trader
+        '''
         self.traders.add(trader)
 
     def reset_episode(self):
@@ -54,3 +56,9 @@ class StockExchange(object):
         '''
         for trader in self.traders:
             trader.get_updated_price(old_price, new_price)
+    
+    def simulate_stock_price(self):
+        ''' Simulate the internal stock for one time step
+        '''
+        self.prev_price = self.curr_price
+        self.curr_price = round(self.stock.simulate_price(), self.roundings[tick])
