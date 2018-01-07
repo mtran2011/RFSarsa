@@ -18,8 +18,6 @@ class SarsaLearner(Learner):
         Args:
             reward (float): the reward seen after taking self._last_action
             next_q (float): value of Q(s',a') where s' is the new_state, a' is new action based on epsilon-greedy (on policy)
-        Returns:
-            None: train internal model based on (self._last_state, self._last_action, reward, new_state)
         '''
         raise NotImplementedError
 
