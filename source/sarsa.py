@@ -3,7 +3,6 @@ from math import log2
 import numpy as np
 from learner import Learner, MatrixLearner
 from sklearn.ensemble import RandomForestRegressor
-from sklearn.tree import DecisionTreeRegressor
 
 class SarsaLearner(Learner):
     ''' Abstract base class for a Sarsa learner (on policy)
@@ -49,3 +48,37 @@ class TabularSarsaMatrix(SarsaMatrix):
     # Override
     def _get_q(self, state, action):
         return self._Q.get((state, action), 0)
+
+class RandomForestSarsaMatrix(SarsaMatrix):
+    ''' Use random forest on all existing values of Q(s,a) to estimate new Q(s,a)
+    The forest is refitted once every 500 steps to all of existing Q
+    '''
+    def __init__(self, actions, epsilon, learning_rate, discount_factor, max_nfeatures=2):
+        super().__init__(actions, epsilon, learning_rate, discount_factor)
+        self.rf = RandomForestRegressor(
+            n_estimators=30, max_features=max_nfeatures,
+            min_samples_leaf=5, n_jobs=2)
+    
+    # Override
+    def _get_q(self, state, action):
+        # in the first 500 training steps, do not estimate, just default to 0
+        if not self._Q:
+            return 0
+        if (state, action) in self._Q:
+            return self._Q[(state, action)]
+        if self._count - 2 < 500:
+            return 0
+        # refit the random forest once every 500 steps
+        if (self._count - 2) % 500 == 0:
+            # prepare training data
+            X, Y = [], []
+            for key, value in self._Q.items():
+                # key is a tuple of (s,a)
+                X.append([*key[0], key[1]])
+                Y.append(value)
+            X = np.array(X)
+            Y = np.array(Y)
+            self.rf.fit(X, Y)
+        # use the random forest to predict Q for this (state, action)
+        x = np.array([*state, action]).reshape(1, len(state)+1)
+        return np.asscalar(self.rf.predict(x))

@@ -11,7 +11,7 @@ class Learner(abc.ABC):
         _last_action (object): the immediate previous action it took
         _last_state (tuple): to memorize the immediate previous state, for which it took _last_action
     '''
-    def __init__(self, actions, epsilon):
+    def __init__(self, actions: tuple, epsilon: float):
         assert isinstance(actions, tuple) and (len(actions) > 0)
         self._actions = actions
         self._epsilon = epsilon
@@ -20,7 +20,7 @@ class Learner(abc.ABC):
         self._last_state = None
     
     @abc.abstractmethod
-    def _find_action_greedily(self, state, use_epsilon=True, return_q=False):
+    def _find_action_greedily(self, state: tuple, use_epsilon=True, return_q=False):
         ''' Given the state, find the best action using epsilon-greedy
         With probability of epsilon, pick a random action. Else pick a greedy action.
         Args:
@@ -34,7 +34,7 @@ class Learner(abc.ABC):
         raise NotImplementedError
 
     @abc.abstractmethod
-    def learn(self, reward, new_state):
+    def learn(self, reward: float, new_state: tuple):
         ''' Get a reward and see a new_state. Use these to do some internal training if self._last_action is not None. 
         Then find and return a new action.        
         Update _last_state <- new_state
@@ -60,8 +60,7 @@ class MatrixLearner(Learner):
         _learning_rate (float): the constant learning_rate
         _discount_factor (float): the constant discount_factor of future rewards
     '''
-
-    def __init__(self, actions, epsilon, learning_rate, discount_factor):
+    def __init__(self, actions: tuple, epsilon: float, learning_rate: float, discount_factor: float):
         super().__init__(actions, epsilon)
         self._Q = dict()        
         self._learning_rate = learning_rate
