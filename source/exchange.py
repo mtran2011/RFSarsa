@@ -5,20 +5,26 @@ class StockExchange(object):
     Stock price can only move in multiple of ticks
     Spread and impact costs are based on lot size and tick size
     Attributes:
-        stock (Stock): the only stock on this exchange        
+        stock (Stock): the only stock on this exchange       
         lot (int): the lot size
         tick (int): the tick size for this single stock
         max_holding (int): the max number of shares a trader can long or short in cumulative
         traders (set): a set of instances of StockTrader
+        prev_price (float): the one-step previous stock price rounded to tick
+        curr_price (float): the current stock price rounded to tick
+        roundings (dict): for convenience in rounding price to tick
     '''
     def __init__(self, stock: Stock, lot: int, tick: int, max_holding: int):
+        self.roundings = {1: 0, 0.1: 1, 0.01: 2}        
         assert lot > 0 and max_holding > 0
-        assert tick in (1, 0.1, 0.01)
+        assert tick in self.roundings
         self.stock = stock
         self.lot = lot
         self.tick = tick
         self.max_holding = max_holding
         self.traders = set()
+        self.prev_price = None
+        self.curr_price = round(stock.price, self.roundings[tick])
     
     def register_trader(self, trader: StockTrader):
         self.traders.add(trader)
