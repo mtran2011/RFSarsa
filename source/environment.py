@@ -35,24 +35,8 @@ class StockTradingEnvironment(Environment):
             if report is True:
                 for trader in self.exchange.traders:
                     result[trader.name].append(trader.wealth)
-
-            ######################################################            
-            
-            order = self.learner.learn(reward, state)
-            transaction_cost = self.exchange.execute(order)
-            pnl = self.exchange.simulate_stock_price()
-
-            delta_wealth = pnl - transaction_cost
-            wealth += delta_wealth
-
-            reward = delta_wealth - 0.5 * util * (delta_wealth - wealth / step_count)**2
-            state = (self.exchange.report_stock_price(), self.exchange.num_shares_owned)
-
-            if report:
-                wealths.append(wealth)
             if step_count % 1000 == 0:
                 print('finished {:,} runs'.format(step_count))
-        
         if report is True:
             return result
         return None
