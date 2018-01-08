@@ -4,12 +4,12 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from stock import OULogStock
 from exchange import StockExchange
-from trader import TabularQMatrixStockTrader, TabularSarsaStockTrader, RFSarsaStockTrader
+from trader import *
 from environment import StockTradingEnvironment
 
 def graph_performance(df: pd.DataFrame, ntrain: int, version: int):
     linestyles = itertools.cycle(['-', ':', '--', '-.'])
-    colors = itertools.cycle(['b', 'g', 'r', 'y', 'k', 'm', 'c'])
+    colors = itertools.cycle(['b', 'g', 'r', 'y', 'm', 'k', 'c'])
     plt.figure()
     for name in df.columns:
         plt.plot(df.index, df[name], label=name, linestyle=next(linestyles), color=next(colors))
@@ -28,9 +28,11 @@ def run_stock_trading(version: int):
     stock_exchange = StockExchange(oustock, lot, tick=1, max_holding=100*lot)
     utility, ntrain, ntest = 1e-3, 5000, 1000
     epsilon, learning_rate, discount_factor = 0.1, 0.5, 0.999
-    tabular_qmatrix = TabularQMatrixStockTrader('tabular q-learning', utility, stock_exchange, actions, epsilon, learning_rate, discount_factor)
-    tabular_sarsa = TabularSarsaStockTrader('tabular sarsa', utility, stock_exchange, actions, epsilon, learning_rate, discount_factor)
-    rf_sarsa = RFSarsaStockTrader('random forest sarsa', utility, stock_exchange, actions, epsilon, learning_rate, discount_factor)
+    rf_sarsa = RFSarsaStockTrader('1: random forest sarsa', utility, stock_exchange, actions, epsilon, learning_rate, discount_factor)
+    tabular_qmatrix = TabularQMatrixStockTrader('2: tabular q-learning', utility, stock_exchange, actions, epsilon, learning_rate, discount_factor)
+    tabular_sarsa = TabularSarsaStockTrader('3: tabular sarsa', utility, stock_exchange, actions, epsilon, learning_rate, discount_factor)
+    gbm_sarsa = GbmSarsaStockTrader('4: gbm sarsa', utility, stock_exchange, actions, epsilon, learning_rate, discount_factor)
+    svr_sarsa = SvrSarsaStockTrader('5: svr sarsa', utility, stock_exchange, actions, epsilon, learning_rate, discount_factor)
     trading_environment = StockTradingEnvironment(stock_exchange)
     trading_environment.run(ntrain)
     result = trading_environment.run(ntest, report=True)
@@ -39,7 +41,7 @@ def run_stock_trading(version: int):
     graph_performance(result, ntrain, version)
 
 def main():
-    for version in range(12):
+    for version in range(4):
         run_stock_trading(version)
 
 if __name__ == '__main__':
