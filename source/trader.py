@@ -1,5 +1,7 @@
 import abc
 from exchange import StockExchange
+from qlearner import TabularQMatrix
+from sarsa import TabularSarsaMatrix, RandomForestSarsaMatrix
 
 class StockTrader(abc.ABC):
     ''' A stock trader that wraps a q-learning or sarsa learner inside
@@ -66,3 +68,28 @@ class StockTrader(abc.ABC):
 
         self.transaction_cost = self.exchange.execute(order)
         self.holding += order
+
+class TabularQMatrixStockTrader(StockTrader):
+    ''' A stock trader whose internal learner is tabular q-learning
+    '''
+    def __init__(self, name: str, utility: float, exchange: StockExchange,
+    actions: tuple, epsilon: float, learning_rate: float, discount_factor: float):
+        super().__init__(name, utility, exchange)
+        self.learner = TabularQMatrix(actions, epsilon, learning_rate, discount_factor)
+
+class TabularSarsaStockTrader(StockTrader):
+    ''' A stock trader whose internal learner is tabular sarsa
+    '''
+    def __init__(self, name: str, utility: float, exchange: StockExchange,
+    actions: tuple, epsilon: float, learning_rate: float, discount_factor: float):
+        super().__init__(name, utility, exchange)
+        self.learner = TabularSarsaMatrix(actions, epsilon, learning_rate, discount_factor)
+
+class RFSarsaStockTrader(StockTrader):
+    ''' A stock trader whose internal learner is random forest sarsa matrix
+    '''
+    def __init__(self, name: str, utility: float, exchange: StockExchange,
+    actions: tuple, epsilon: float, learning_rate: float, discount_factor: float):
+        super().__init__(name, utility, exchange)
+        self.learner = RandomForestSarsaMatrix(actions, epsilon, learning_rate, discount_factor)
+        

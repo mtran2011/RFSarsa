@@ -55,7 +55,7 @@ class RandomForestSarsaMatrix(SarsaMatrix):
     '''
     def __init__(self, actions, epsilon, learning_rate, discount_factor, max_nfeatures=2):
         super().__init__(actions, epsilon, learning_rate, discount_factor)
-        self.rf = RandomForestRegressor(
+        self.randomforest = RandomForestRegressor(
             n_estimators=30, max_features=max_nfeatures,
             min_samples_leaf=5, n_jobs=2)
     
@@ -78,7 +78,7 @@ class RandomForestSarsaMatrix(SarsaMatrix):
                 Y.append(value)
             X = np.array(X)
             Y = np.array(Y)
-            self.rf.fit(X, Y)
+            self.randomforest.fit(X, Y)
         # use the random forest to predict Q for this (state, action)
         x = np.array([*state, action]).reshape(1, len(state)+1)
-        return np.asscalar(self.rf.predict(x))
+        return np.asscalar(self.randomforest.predict(x))
