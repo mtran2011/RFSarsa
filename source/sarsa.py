@@ -3,6 +3,8 @@ from math import log2
 import numpy as np
 from learner import Learner, MatrixLearner
 from sklearn.ensemble import RandomForestRegressor
+from sklearn.svm import SVR
+from xgboost import XGBRegressor
 
 class SarsaLearner(Learner):
     ''' Abstract base class for a Sarsa learner (on policy)
@@ -82,3 +84,72 @@ class RandomForestSarsaMatrix(SarsaMatrix):
         # use the random forest to predict Q for this (state, action)
         x = np.array([*state, action]).reshape(1, len(state)+1)
         return np.asscalar(self.randomforest.predict(x))
+
+class GbmSarsaMatrix(SarsaMatrix):
+    ''' Use gradient boosting of trees on all existing values of Q(s,a) to estimate new Q(s,a)
+    The model is refitted once every 500 steps to all of existing Q
+    '''
+    def __init__(self, actions, epsilon, learning_rate, discount_factor, n_trees=100):
+        super().__init__(actions, epsilon, learning_rate, discount_factor)
+        self.gbm = XGBRegressor(n_estimators=n_trees, n_jobs=2)
+    
+    # Override
+    def _get_q(self, state, action):
+        # in the first 500 training steps, do not estimate, just default to 0
+        if not self._Q:
+            return 0
+        if (state, action) in self._Q:
+            return self._Q[(state, action)]
+        if self._count - 2 < 500:
+            return 0
+        # refit the GBM once every 500 steps
+        if (self._count - 2) % 500 == 0:
+            # prepare training data
+            X, Y = [], []
+            for key, value in self._Q.items():
+                # key is a tuple of (s,a)
+                X.append([*key[0], key[1]])
+                Y.append(value)
+            X = np.array(X)
+            Y = np.array(Y)
+            self.gbm.fit(X, Y)
+        # use the GBM to predict Q for this (state, action)
+        x = np.array([*state, action]).reshape(1, len(state)+1)
+        return np.asscalar(self.gbm.predict(x))
+
+class SvrSarsaMatrix(SarsaMatrix):
+    ''' Use support vector regression of trees on all existing values of Q(s,a) to estimate new Q(s,a)
+    The model is refitted once every 500 steps to all of existing Q
+    Args:
+        kernel (str): either rbf or sigmoid
+        gamma (float): Kernel coefficient for ‘rbf’, ‘poly’ and ‘sigmoid’. If gamma is ‘auto’ then 1/n_features will be used.
+        C (float): penalty parameter C of the error term.
+    '''
+    def __init__(self, actions, epsilon, learning_rate, discount_factor, kernel='rbf', gamma='auto', C=1.0):
+        assert kernel in ('rbf', 'sigmoid')
+        super().__init__(actions, epsilon, learning_rate, discount_factor)
+        self.svr = SVR(kernel=kernel, gamma=gamma, C=C)
+    
+    # Override
+    def _get_q(self, state, action):
+        # in the first 500 training steps, do not estimate, just default to 0
+        if not self._Q:
+            return 0
+        if (state, action) in self._Q:
+            return self._Q[(state, action)]
+        if self._count - 2 < 500:
+            return 0
+        # refit the GBM once every 500 steps
+        if (self._count - 2) % 500 == 0:
+            # prepare training data
+            X, Y = [], []
+            for key, value in self._Q.items():
+                # key is a tuple of (s,a)
+                X.append([*key[0], key[1]])
+                Y.append(value)
+            X = np.array(X)
+            Y = np.array(Y)
+            self.svr.fit(X, Y)
+        # use the GBM to predict Q for this (state, action)
+        x = np.array([*state, action]).reshape(1, len(state)+1)
+        return np.asscalar(self.svr.predict(x))
