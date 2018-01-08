@@ -1,5 +1,4 @@
 from stock import Stock
-from trader import StockTrader
 
 class StockExchange(object):
     ''' An exchange referencing one single stock and a set of stock traders
@@ -27,7 +26,7 @@ class StockExchange(object):
         self.prev_price = None
         self.curr_price = round(stock.price, self.roundings[tick])
     
-    def register_trader(self, trader: StockTrader):
+    def register_trader(self, trader):
         ''' Register a trader
         '''
         self.traders.add(trader)
