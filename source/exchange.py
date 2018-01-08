@@ -61,3 +61,4 @@ class StockExchange(object):
         '''
         self.prev_price = self.curr_price
         self.curr_price = round(self.stock.simulate_price(), self.roundings[self.tick])
+        self.notify_traders(self.prev_price, self.curr_price)
