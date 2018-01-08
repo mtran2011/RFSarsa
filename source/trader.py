@@ -28,7 +28,7 @@ class StockTrader(abc.ABC):
         self.transaction_cost = 0
         self.wealth = 0
         self.step_count = 0
-        self.reward = 0
+        self.reward = None
         self.state = (self.exchange.curr_price, self.holding)
         self.learner = None
     
@@ -39,7 +39,7 @@ class StockTrader(abc.ABC):
         self.transaction_cost = 0
         self.wealth = 0
         self.step_count = 0
-        self.reward = 0
+        self.reward = None
         self.state = (self.exchange.curr_price, self.holding)
         self.learner.reset_episode()
 
