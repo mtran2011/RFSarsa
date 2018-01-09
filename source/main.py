@@ -39,7 +39,7 @@ def run_stock_trading(version: int):
     graph_performance(result, ntrain, version)
 
 def main():
-    for version in range(4):
+    for version in range(12):
         run_stock_trading(version)
 
 if __name__ == '__main__':

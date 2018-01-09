@@ -4,7 +4,7 @@ import numpy as np
 from learner import Learner, MatrixLearner
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.svm import SVR
-from xgboost import XGBRegressor
+# from xgboost import XGBRegressor
 
 class SarsaLearner(Learner):
     ''' Abstract base class for a Sarsa learner (on policy)
