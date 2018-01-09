@@ -47,4 +47,6 @@ class OULogStock(Stock):
         dW = dt**0.5 * random.gauss(0,1)
         dlogS = self.kappa * (self.mu - old_log) * dt + self.sigma * dW
         self.price = self.price * exp(dlogS)
+        self.price = max(self.price, self.minp)
+        self.price = min(self.price, self.maxp)
         return self.price

@@ -87,14 +87,12 @@ class MatrixLearner(Learner):
                 max_q = self._get_q(state, best_action)
         else:
             # choose action = arg max {action} of Q(state, action)
-            q_values = [self._get_q(state, action) for action in self._actions]
-            index, max_q = max(enumerate(q_values), key=operator.itemgetter(1))
+            q_values = [(self._get_q(state, action), action) for action in self._actions]
+            max_q, best_action = max(q_values, key=operator.itemgetter(0))
             # if max_q is 0, then either this state has never been visited
             # or the state has been visited but previous action results in negative reward
             if max_q == 0:
-                best_action = random.choice(self._actions)
-            else:
-                best_action = self._actions[index]
+                best_action = random.choice([pair[1] for pair in q_values if pair[0]==0])
         
         if return_q:
             return best_action, max_q

@@ -22,17 +22,15 @@ def graph_performance(df: pd.DataFrame, ntrain: int, version: int):
     plt.savefig('../figs/newfig{}.png'.format(version))
 
 def run_stock_trading(version: int):
-    oustock = OULogStock(price=50, maxp=1050, minp=0, kappa=0.1, mu=log(75), sigma=0.1)
+    oustock = OULogStock(price=100, maxp=500, minp=0, kappa=0.1, mu=log(150), sigma=0.1)
     lot = 10
     actions = tuple(range(-5*lot, 6*lot, lot))
-    stock_exchange = StockExchange(oustock, lot, tick=1, max_holding=100*lot)
+    stock_exchange = StockExchange(oustock, lot, tick=0.1, max_holding=100*lot)
     utility, ntrain, ntest = 1e-3, 5000, 1000
     epsilon, learning_rate, discount_factor = 0.1, 0.5, 0.999
-    rf_sarsa = RFSarsaStockTrader('1: random forest sarsa', utility, stock_exchange, actions, epsilon, learning_rate, discount_factor)
-    tabular_qmatrix = TabularQMatrixStockTrader('2: tabular q-learning', utility, stock_exchange, actions, epsilon, learning_rate, discount_factor)
-    tabular_sarsa = TabularSarsaStockTrader('3: tabular sarsa', utility, stock_exchange, actions, epsilon, learning_rate, discount_factor)
-    gbm_sarsa = GbmSarsaStockTrader('4: gbm sarsa', utility, stock_exchange, actions, epsilon, learning_rate, discount_factor)
-    svr_sarsa = SvrSarsaStockTrader('5: svr sarsa', utility, stock_exchange, actions, epsilon, learning_rate, discount_factor)
+    rf_sarsa = RFSarsaStockTrader('random forest sarsa', utility, stock_exchange, actions, epsilon, learning_rate, discount_factor)
+    tabular_qmatrix = TabularQMatrixStockTrader('tabular q-learning', utility, stock_exchange, actions, epsilon, learning_rate, discount_factor)
+    tabular_sarsa = TabularSarsaStockTrader('tabular sarsa', utility, stock_exchange, actions, epsilon, learning_rate, discount_factor)
     trading_environment = StockTradingEnvironment(stock_exchange)
     trading_environment.run(ntrain)
     result = trading_environment.run(ntest, report=True)
